@@ -22,9 +22,23 @@ class HandoffBriefBuilder:
         - Keep this domain-specific prompt logic in this builder class,
           not in the reusable AI client.
         """
-        # TODO: Validate notes.
-        # TODO: Build and return a prompt for a new handoff brief.
-        pass
+        # Validate notes
+        if not notes or not notes.strip():
+            raise ValueError("Shift notes cannot be empty.")
+        
+        # Build and return a prompt for a new handoff brief.
+        sections = "\n".join(self.REQUIRED_SECTIONS)
+
+        return (
+            "You are creating a shift handoff brief for a retail store.\n"
+            "Use the shift notes below to produce a structured handoff brief.\n\n"
+            f"Shift notes:\n{notes.strip()}\n\n"
+            "Do not invent unsupported details. If information is missing, "
+            "write \"Unknown\" for that detail.\n\n"
+            "Respond using exactly these section labels:\n"
+            f"{sections}\n"
+        )
+    
 
     def build_revision_prompt(self, feedback):
         """
