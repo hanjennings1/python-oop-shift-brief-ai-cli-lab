@@ -79,8 +79,11 @@ class HandoffBriefBuilder:
         - Return True only when the response contains every required section label.
         - Return False if one or more required sections are missing.
         """
-        # TODO: Check whether response_text contains all required sections.
-        pass
+        # Check whether response_text contains all required sections.
+        if not response_text or not response_text.strip():
+            return False
+        return all(section in response_text for section in self.REQUIRED_SECTIONS)
+
 
     def format_brief(self, response_text):
         """
@@ -91,8 +94,9 @@ class HandoffBriefBuilder:
         - Add a clear user-facing heading before the response text.
         - Preserve the AI response content.
         """
-        # TODO: Return a formatted created-brief string.
-        pass
+        # Return a formatted created-brief string.
+        return f"\nShift Handoff Brief\n{response_text}"
+
 
     def create_brief(self, ai_client, notes):
         """
