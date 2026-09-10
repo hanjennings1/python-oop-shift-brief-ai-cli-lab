@@ -85,7 +85,7 @@ class HandoffBriefBuilder:
         return all(section in response_text for section in self.REQUIRED_SECTIONS)
 
 
-    def format_brief(self, response_text):
+    def format_brief(self, response_text, revised=False):
         """
         Format a created handoff brief for display.
 
@@ -94,8 +94,14 @@ class HandoffBriefBuilder:
         - Add a clear user-facing heading before the response text.
         - Preserve the AI response content.
         """
+        # Choose the heading based on whether this is a new or revised brief
+        if revised:
+            heading = "Revised Shift Handoff Brief"
+        else:
+            heading = "Shift Handoff Brief"
+
         # Return a formatted created-brief string.
-        return f"\nShift Handoff Brief\n{response_text}"
+        return f"\n{heading}\n{response_text}"
 
 
     def create_brief(self, ai_client, notes):
@@ -109,11 +115,16 @@ class HandoffBriefBuilder:
         - Raise RuntimeError if the AI response is not usable.
         - Return a formatted user-facing brief.
         """
-        # TODO: Build the prompt.
-        # TODO: Send the prompt through the AI client.
-        # TODO: Verify the response structure.
-        # TODO: Return the formatted brief.
-        pass
+        # Build the prompt
+        prompt = self.build_brief_prompt(notes)
+        # Send the prompt through the AI client
+        response = ai_client.send(prompt)
+        # Verify the response structure
+        if not self.is_usable_brief(response):
+            raise RuntimeError("AI response did not include required sections.")
+        # Return the formatted brief.
+        return self.format_brief(response)
+
 
     def revise_brief(self, ai_client, feedback):
         """
@@ -126,8 +137,14 @@ class HandoffBriefBuilder:
         - Raise RuntimeError if the AI response is not usable.
         - Return a formatted user-facing revised brief.
         """
-        # TODO: Build the revision prompt.
-        # TODO: Send the prompt through the AI client.
-        # TODO: Verify the response structure.
-        # TODO: Return the formatted revised brief.
-        pass
+        # Build the revision prompt
+        prompt = self.build_revision_prompt(feedback)
+
+        # Send the prompt through the AI client
+        response = ai_client.send(prompt)
+
+        # Verify the response structure
+        if not self.is_usable_brief(response):
+            raise RuntimeError("AI response did not include required sections.")
+        # Return the formatted revised brief.
+        return self.format_brief(response, revised=True)
