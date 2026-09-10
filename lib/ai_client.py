@@ -35,10 +35,25 @@ class OllamaChatClient:
             - preserve previous valid history,
             - raise RuntimeError with a clear service-error message.
         """
-        # TODO: Validate the prompt.
-        # TODO: Create and append the user message.
-        # TODO: Call ollama.chat().
-        # TODO: Extract assistant content from the response.
+        # Validate the prompt
+        if not prompt or not prompt.strip():
+            raise ValueError("Prompt cannot be empty.")
+        # Create and append the user message
+        user_message = {"role": "user", "content": prompt.strip()}
+        self.history.append(user_message)
+        # Call ollama.chat()
+        try:
+            response = ollama.chat(model=self.model_name, messages=self.history)
+        except Exception as error:
+            # ROLLBACK + RAISE RUNTIME ERROR HERE <---------
+            raise
+        # Extract assistant content from the response
+        try:
+            content = response["message"]["content"]
+        except (TypeError, KeyError):
+            content = getattr(response, "message", None)
+            content = getattr(content, "content", None)
+        
         # TODO: Append the assistant message after a successful response.
         # TODO: Return the assistant response text.
         # TODO: Roll back the failed user message and raise RuntimeError if needed.
