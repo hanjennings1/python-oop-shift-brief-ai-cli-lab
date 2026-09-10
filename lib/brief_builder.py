@@ -26,7 +26,7 @@ class HandoffBriefBuilder:
         if not notes or not notes.strip():
             raise ValueError("Shift notes cannot be empty.")
         
-        # Build and return a prompt for a new handoff brief.
+        # Build and return a prompt for a new handoff brief
         sections = "\n".join(self.REQUIRED_SECTIONS)
 
         return (
@@ -51,9 +51,24 @@ class HandoffBriefBuilder:
         - Include every required section label from REQUIRED_SECTIONS.
         - Tell the model not to invent unsupported details.
         """
-        # TODO: Validate feedback.
-        # TODO: Build and return a revision prompt.
-        pass
+        # Validate feedback
+        if not feedback or not feedback.strip():
+            raise ValueError("Revision feedback cannot be empty.")
+        
+        # Build and return a revision prompt
+        sections = "\n".join(self.REQUIRED_SECTIONS)
+
+        return (
+            "You are writing a revision of the previous shift handoff brief "
+            "based on manager feedback.\n"
+            "Use the earlier brief from the conversation history as context.\n\n"
+            f"Revision feedback:\n{feedback.strip()}\n\n"
+            "Do not invent unsupported details. If information is missing, "
+            "write \"Unknown\" for that detail.\n\n"
+            "Respond using exactly these section labels:\n"
+            f"{sections}\n"
+        )
+
 
     def is_usable_brief(self, response_text):
         """
