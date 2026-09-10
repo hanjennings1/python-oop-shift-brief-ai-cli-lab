@@ -32,25 +32,14 @@ class ShiftBriefCLI:
 
 
     def handle_command(self, raw_input):
-        """
-        Route a user command.
-
-        Requirements:
-        - Return a readable input error for blank input.
-        - Commands should be case-insensitive.
-        - Extra spaces around commands should not break the app.
-        - brief <shift notes> should call the brief builder's create_brief().
-        - revise <feedback> should call the brief builder's revise_brief().
-        - history should return the current message count.
-        - reset should clear conversation history.
-        - help should return command guidance.
-        - exit and quit should stop the application.
-        - Unknown commands should return a readable input error.
-        - ValueError should become a readable Input Error.
-        - RuntimeError should become a readable Service Error.
-        """
-        # TODO: Validate raw_input.
-        # TODO: Parse the command and payload.
+        # Validate raw_input
+        if not raw_input or not raw_input.strip():
+            return "Input Error: Command cannot be empty"
+        # Parse the command and payload
+        stripped_input = raw_input.strip()
+        parts = stripped_input.split(maxsplit=1)
+        command = parts[0].lower()
+        payload = parts[1].strip() if len(parts) > 1 else ""
         # TODO: Route supported commands.
         # TODO: Return helpful messages for errors and unknown commands.
         pass
