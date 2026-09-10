@@ -6,45 +6,30 @@ class ShiftBriefCLI:
     """Command-line workflow for generating and revising shift handoff briefs."""
 
     def __init__(self, ai_client, brief_builder=None):
-        """
-        Initialize the CLI application.
-
-        Requirements:
-        - Store the injected AI client.
-        - Use the provided brief builder when one is passed in.
-        - Create a HandoffBriefBuilder when one is not passed in.
-        - Set self.running to True.
-        """
         self.ai_client = ai_client
         self.brief_builder = brief_builder or HandoffBriefBuilder()
         self.running = True
 
-    def display_welcome(self):
-        """
-        Print a welcome message and command guidance.
 
-        Requirements:
-        - Mention that this is a shift handoff brief CLI.
-        - Include the available commands.
-        """
-        # TODO: Print welcome text and command help.
-        pass
+    def display_welcome(self):
+        # Print welcome text and command help.
+        print("Shift Handoff Brief CLI")
+        print("Create and revise AI-assisted shift handoff briefs.")
+        print()
+        print(self.command_help())
+
 
     def command_help(self):
-        """
-        Return command guidance as a string.
+        return (
+            "Commands:\n"
+            "- brief <shift notes>     Create a new handoff brief.\n"
+            "- revise <feedback>       Revise the previous brief using feedback.\n"
+            "- history                 Show the current conversation message count.\n"
+            "- reset                   Clear conversation history.\n"
+            "- help                    Show this command list.\n"
+            "- exit or quit            Stop the program."
+        )
 
-        Required commands:
-        - brief <shift notes>
-        - revise <feedback>
-        - history
-        - reset
-        - help
-        - exit
-        - quit
-        """
-        # TODO: Return a string describing the available commands.
-        pass
 
     def handle_command(self, raw_input):
         """
