@@ -7,7 +7,6 @@ class OllamaChatClient:
     def __init__(self, model_name="llama3.2"):
         """
         Initialize the client.
-
         Requirements:
         - Store the model name.
         - Create an empty list for conversation history.
@@ -15,6 +14,7 @@ class OllamaChatClient:
         """
         self.model_name = model_name
         self.history = []
+
 
     def send(self, prompt):
         """
@@ -38,26 +38,38 @@ class OllamaChatClient:
         # Validate the prompt
         if not prompt or not prompt.strip():
             raise ValueError("Prompt cannot be empty.")
+
         # Create and append the user message
         user_message = {"role": "user", "content": prompt.strip()}
         self.history.append(user_message)
-        # Call ollama.chat()
+
+        # Call the AI service and validate its response
         try:
             response = ollama.chat(model=self.model_name, messages=self.history)
-        except Exception as error:
-            # ROLLBACK + RAISE RUNTIME ERROR HERE <---------
-            raise
-        # Extract assistant content from the response
-        try:
-            content = response["message"]["content"]
-        except (TypeError, KeyError):
-            content = getattr(response, "message", None)
-            content = getattr(content, "content", None)
-        
-        # TODO: Append the assistant message after a successful response.
-        # TODO: Return the assistant response text.
-        # TODO: Roll back the failed user message and raise RuntimeError if needed.
-        pass
+
+            # Extract assistant content, supporting both dict-style and object-style responses
+            try:
+                content = response["message"]["content"]
+            except (TypeError, KeyError):
+                content = getattr(response, "message", None)
+                content = getattr(content, "content", None)
+
+            # Reject missing, non-string, or blank content
+            if not isinstance(content, str) or not content.strip():
+                raise RuntimeError("unusable response")
+
+        except Exception:
+            # Roll back the failed user message and surface a clear service error
+            self.history.remove(user_message)
+            raise RuntimeError("AI service request failed.")
+
+        # Append the assistant response only after a successful, usable response
+        assistant_message = {"role": "assistant", "content": content}
+        self.history.append(assistant_message)
+
+        # Return the assistant response text
+        return content
+
 
     def reset(self):
         """
@@ -66,8 +78,9 @@ class OllamaChatClient:
         Requirements:
         - After this method runs, self.history should be an empty list.
         """
-        # TODO: Clear conversation history.
-        pass
+        # Clear conversation history.
+        self.history = []
+
 
     def message_count(self):
         """
@@ -77,8 +90,8 @@ class OllamaChatClient:
         - Return an integer.
         - Count both user messages and assistant messages.
         """
-        # TODO: Return the number of stored messages.
-        pass
+        # Return the number of stored messages.
+        return len(self.history)
 
     def get_transcript(self):
         """
@@ -89,5 +102,5 @@ class OllamaChatClient:
         - Do not return the internal self.history list directly.
         - The returned message dictionaries should also be copies.
         """
-        # TODO: Return a copy of the transcript.
-        pass
+        # Return a copy of the transcript.
+        return [message.copy() for message in self.history]
