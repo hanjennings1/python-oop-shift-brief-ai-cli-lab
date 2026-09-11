@@ -34,7 +34,7 @@ class ShiftBriefCLI:
     def handle_command(self, raw_input):
         # Validate raw_input
         if not raw_input or not raw_input.strip():
-            return "Input Error: Command cannot be empty"
+            return "Input Error: Command cannot be empty."
         # Parse the command and payload
         stripped_input = raw_input.strip()
         parts = stripped_input.split(maxsplit=1)

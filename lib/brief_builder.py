@@ -9,6 +9,16 @@ class HandoffBriefBuilder:
         "Risk Notes:",
     )
 
+    def _guidance(self):
+        # Shared instructions used by both build_brief_prompt and build_revision_prompt
+        sections = "\n".join(self.REQUIRED_SECTIONS)
+        return (
+            "Do not invent unsupported details. If information is missing, "
+            "write \"Unknown\" for that detail.\n\n"
+            "Respond using exactly these section labels:\n"
+            f"{sections}\n"
+        )
+
     def build_brief_prompt(self, notes):
 
         # Validate notes
@@ -16,16 +26,11 @@ class HandoffBriefBuilder:
             raise ValueError("Shift notes cannot be empty.")
         
         # Build and return a prompt for a new handoff brief
-        sections = "\n".join(self.REQUIRED_SECTIONS)
-
         return (
             "You are creating a shift handoff brief for a retail store.\n"
             "Use the shift notes below to produce a structured handoff brief.\n\n"
             f"Shift notes:\n{notes.strip()}\n\n"
-            "Do not invent unsupported details. If information is missing, "
-            "write \"Unknown\" for that detail.\n\n"
-            "Respond using exactly these section labels:\n"
-            f"{sections}\n"
+            f"{self._guidance()}"
         )
     
 
@@ -36,17 +41,12 @@ class HandoffBriefBuilder:
             raise ValueError("Revision feedback cannot be empty.")
         
         # Build and return a revision prompt
-        sections = "\n".join(self.REQUIRED_SECTIONS)
-
         return (
             "You are writing a revision of the previous shift handoff brief "
             "based on manager feedback.\n"
             "Use the earlier brief from the conversation history as context.\n\n"
             f"Revision feedback:\n{feedback.strip()}\n\n"
-            "Do not invent unsupported details. If information is missing, "
-            "write \"Unknown\" for that detail.\n\n"
-            "Respond using exactly these section labels:\n"
-            f"{sections}\n"
+            f"{self._guidance()}"
         )
 
 
