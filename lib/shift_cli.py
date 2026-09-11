@@ -40,25 +40,59 @@ class ShiftBriefCLI:
         parts = stripped_input.split(maxsplit=1)
         command = parts[0].lower()
         payload = parts[1].strip() if len(parts) > 1 else ""
-        # TODO: Route supported commands.
-        # TODO: Return helpful messages for errors and unknown commands.
-        pass
+
+        # Route supported commands.
+        # Return helpful messages for errors and unknown commands.
+        if command == "brief":
+            if not payload:
+                return "Input Error: Please provide shift notes to create a brief."
+            try:
+                return self.brief_builder.create_brief(self.ai_client, payload)
+            except ValueError as error:
+                return f"Input Error: {error}"
+            except RuntimeError as error:
+                return f"Service Error: {error}"
+
+        if command == "revise":
+            if not payload:
+                return "Input Error: Please provide revision feedback."
+            try:
+                return self.brief_builder.revise_brief(self.ai_client, payload)
+            except ValueError as error:
+                return f"Input Error: {error}"
+            except RuntimeError as error:
+                return f"Service Error: {error}"
+
+        if command in ("exit", "quit"):
+            self.running = False
+            return "Goodbye!"
+
+        if command == "help":
+            return self.command_help()
+
+        if command == "history":
+            return f"Conversation messages: {self.ai_client.message_count()}"
+
+        if command == "reset":
+            self.ai_client.reset()
+            return "Conversation history reset."
+        
+        # Unknown command fallback
+        return f"Input Error: Unknown command '{command}'. Type 'help' for a list of commands."
+
 
     def run(self):
-        """
-        Run the CLI input loop.
+        # Display welcome text
+        self.display_welcome()
+        # Run the input loop
+        while self.running:
+            try:
+                raw_input = input("> ")
+            except EOFError:
+                break
 
-        Requirements:
-        - Display the welcome message before the loop starts.
-        - Continue while self.running is True.
-        - Read user input.
-        - Pass user input to handle_command().
-        - Print returned messages.
-        - Stop cleanly if EOFError occurs.
-        """
-        # TODO: Display welcome text.
-        # TODO: Run the input loop.
-        pass
+            response = self.handle_command(raw_input)
+            print(response)
 
 
 def main():
